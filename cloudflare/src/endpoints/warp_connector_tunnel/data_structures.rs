@@ -54,3 +54,40 @@ pub struct WarpConnectorCredentialsFile {
 
 impl ApiResult for WarpConnectorTunnel {}
 impl ApiResult for Vec<WarpConnectorTunnel> {}
+
+/// A Warp Connector client maintaining a connection to a Cloudflare data center.
+///
+/// Returned by both the connections list and the single-connector get endpoints.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnector {
+    pub id: Option<Uuid>,
+    pub arch: Option<String>,
+    pub conns: Option<Vec<WarpConnectorConn>>,
+    pub features: Option<Vec<String>>,
+    pub ha_status: Option<WarpConnectorHaStatus>,
+    pub run_at: Option<DateTime<Utc>>,
+    pub version: Option<String>,
+}
+
+/// A single Warp Connector connection between a client and Cloudflare's edge.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnectorConn {
+    pub id: Option<Uuid>,
+    pub client_id: Option<Uuid>,
+    pub client_version: Option<String>,
+    pub colo_name: Option<String>,
+    pub opened_at: Option<DateTime<Utc>>,
+    pub origin_ip: Option<String>,
+}
+
+/// HA status reported by a Warp Connector client.
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[serde(rename_all = "lowercase")]
+pub enum WarpConnectorHaStatus {
+    Offline,
+    Passive,
+    Active,
+}
+
+impl ApiResult for WarpConnector {}
+impl ApiResult for Vec<WarpConnector> {}
