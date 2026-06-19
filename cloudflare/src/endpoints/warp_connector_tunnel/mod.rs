@@ -8,4 +8,5 @@ pub mod get_tunnel;
 pub mod list_connections;
 pub mod list_tunnels;
 pub mod trigger_failover;
+pub mod update_ha_configuration;
 pub mod update_tunnel;

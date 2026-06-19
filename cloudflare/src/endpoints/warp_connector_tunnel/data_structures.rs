@@ -102,7 +102,7 @@ pub struct WarpConnectorHaConfiguration {
     pub tunnel_id: Uuid,
     /// Provider-specific configuration; present for `aws` and `local` modes.
     #[serde(default)]
-    pub config: Option<WarpConnectorHaConfig>,
+    pub config: Option<WarpConnectorProviderConfiguration>,
     pub updated_at: Option<DateTime<Utc>>,
 }
 
@@ -123,20 +123,20 @@ pub enum WarpConnectorHaMode {
 /// Provider-specific HA configuration payload, discriminated by shape.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-pub enum WarpConnectorHaConfig {
-    Aws(WarpConnectorHaAwsConfig),
-    Local(WarpConnectorHaLocalConfig),
+pub enum WarpConnectorProviderConfiguration {
+    Aws(WarpConnectorAwsProviderConfiguration),
+    Local(WarpConnectorHaLocalProviderConfiguration),
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct WarpConnectorHaAwsConfig {
+pub struct WarpConnectorAwsProviderConfiguration {
     /// Floating Network Resource ID — the secondary ENI moved between nodes
     /// on failover.
     pub fnr_id: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct WarpConnectorHaLocalConfig {
+pub struct WarpConnectorHaLocalProviderConfiguration {
     /// VIPs to assign on the CloudflareWARP interface.
     pub vips: Vec<WarpConnectorVip>,
     /// VIPs to clean up on demotion or version drift.
