@@ -91,3 +91,63 @@ pub enum WarpConnectorHaStatus {
 
 impl ApiResult for WarpConnector {}
 impl ApiResult for Vec<WarpConnector> {}
+
+/// HA configuration for a Warp Connector Tunnel.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnectorHaConfiguration {
+    /// Monotonically increasing configuration version, incremented on each PUT.
+    pub configuration_version: u64,
+    pub created_at: DateTime<Utc>,
+    pub ha_mode: WarpConnectorHaMode,
+    pub tunnel_id: Uuid,
+    /// Provider-specific configuration; present for `aws` and `local` modes.
+    #[serde(default)]
+    pub config: Option<WarpConnectorHaConfig>,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+/// HA mode for a Warp Connector tunnel.
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[serde(rename_all = "lowercase")]
+pub enum WarpConnectorHaMode {
+    /// HA enabled but no provider configured yet.
+    None,
+    /// HA explicitly turned off.
+    Disabled,
+    /// AWS ENI move-based failover.
+    Aws,
+    /// Local VIP-based failover.
+    Local,
+}
+
+/// Provider-specific HA configuration payload, discriminated by shape.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum WarpConnectorHaConfig {
+    Aws(WarpConnectorHaAwsConfig),
+    Local(WarpConnectorHaLocalConfig),
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnectorHaAwsConfig {
+    /// Floating Network Resource ID — the secondary ENI moved between nodes
+    /// on failover.
+    pub fnr_id: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnectorHaLocalConfig {
+    /// VIPs to assign on the CloudflareWARP interface.
+    pub vips: Vec<WarpConnectorVip>,
+    /// VIPs to clean up on demotion or version drift.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vips_previous: Option<Vec<WarpConnectorVip>>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnectorVip {
+    /// Virtual IP address (IPv4 or IPv6).
+    pub address: String,
+}
+
+impl ApiResult for WarpConnectorHaConfiguration {}
