@@ -39,9 +39,11 @@ impl EndpointSpec for UpdateTunnel<'_> {
 /// Params for updating a Warp Connector Tunnel
 #[serde_as]
 #[serde_with::skip_serializing_none]
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug, Default)]
 pub struct Params<'a> {
-    /// The name for the Tunnel to be updated. It must be unique within the account.
-    pub name: &'a str,
-    pub tunnel_secret: &'a str,
+    /// A user-friendly name for a tunnel.
+    pub name: Option<&'a str>,
+    /// Base64-encoded secret of at least 32 bytes used to authenticate a
+    /// locally-managed tunnel.
+    pub tunnel_secret: Option<&'a str>,
 }
