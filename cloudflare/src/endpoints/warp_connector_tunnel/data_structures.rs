@@ -22,6 +22,17 @@ pub struct WarpConnectorTunnel {
     pub tun_type: String,
     pub metadata: serde_json::Value,
     pub status: TunnelStatusType,
+    /// Present on create responses; absent on delete responses.
+    #[serde(flatten)]
+    pub credentials: Option<WarpConnectorCredentials>,
+}
+
+/// Credentials bundle returned only when a Warp Connector Tunnel is created.
+///
+/// Flattened into [`WarpConnectorTunnel`] so it inlines `credentials_file` and
+/// `token` at the top level of the JSON.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WarpConnectorCredentials {
     pub credentials_file: WarpConnectorCredentialsFile,
     pub token: String,
 }
